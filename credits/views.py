@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+from clients.models import Client
 
 from .models import Credit, Payment, InterestRate, ClientCreditProduct
 from .serializers import CreditSerializer, PaymentSerializer, InterestRateSerializer, ClientCreditProductSerializer
@@ -32,6 +32,9 @@ class CreditViewSet(viewsets.ModelViewSet):
         if not client_id:
             return Response({"error": "Client ID is required"}, status=400)
         
+        if not Client.objects.filter(id=client_id).exists():
+            return Response({"error": "Client not found"}, status=400)
+    
         credits = Credit.objects.filter(client_id=client_id)
         serializer = self.get_serializer(credits, many=True)
         

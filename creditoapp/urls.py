@@ -41,8 +41,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
-    #path('products/', include('products.urls')),
     path('admin/', admin.site.urls),
-    path('api/interest-rates/', InterestRateListCreateView.as_view(), name='Interest rates'),
+    path('api/interest-rates/', InterestRateListCreateView.as_view(), name='Interest_rates'),
 ]
 

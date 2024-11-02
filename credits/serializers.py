@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from .models import Credit, Payment, InterestRate, ClientCreditProduct
 
 from products.models import Product
@@ -38,8 +39,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             credit.save()
         
         return instance
-        
-        
+             
 class InterestRateSerializer(serializers.ModelSerializer):   
     
     class Meta:
@@ -65,6 +65,7 @@ class ClientCreditProductSerializer(serializers.ModelSerializer):
             ]
         
 class CreditSerializer(serializers.ModelSerializer):
+    
     products = ClientCreditProductSerializer(source='clientcreditproduct_set', many=True)
     
     client = serializers.PrimaryKeyRelatedField(queryset=Client.objects.all(), write_only=True)
@@ -98,7 +99,7 @@ class CreditSerializer(serializers.ModelSerializer):
     #Validates that a product exists
     def validate_products(self, value):
         if not value:
-            raise serializers.ValidationError("There must be at least one product.")
+            raise ValidationError("There must be at least one product.")
         return value
     
     #Updates the product in the credit
@@ -110,13 +111,14 @@ class CreditSerializer(serializers.ModelSerializer):
                 
         new_product_ids = [product['id_product'].id for product in product_data]
         
-        #Update products in a credit
-        #instance.clientcreditproduct_set.exclude(id_product__in=new_product_ids).delete()
-                
-        for product in product_data:
-            ClientCreditProduct.objects.update_or_create(id_credit=instance, id_product=product['id_product'].id, defaults=product)
-                
-        instance.total_amount = instance.calculate_total_amount()
+        if new_product_ids:
+            #Update products in a credit
+            instance.clientcreditproduct_set.exclude(id_product__in=new_product_ids).delete()
+                    
+            for product in product_data:
+                ClientCreditProduct.objects.update_or_create(id_credit=instance, id_product=product['id_product'].id, defaults=product)
+                    
+            instance.total_amount = instance.calculate_total_amount()
             
         
     def create(self, validated_data):
@@ -153,6 +155,8 @@ class CreditSerializer(serializers.ModelSerializer):
                     instance.end_date = instance.start_date + relativedelta(months=instance.no_installment-1)
                     
                     self._update_credit_products(instance, validated_data)
+                    
+                    instance.status = "approved"
                 
             elif status == "rejected": 
                 instance.status = "rejected"
@@ -160,7 +164,9 @@ class CreditSerializer(serializers.ModelSerializer):
             elif status == "pending":
                 self._update_credit_products(instance, validated_data)
                 
-                        
+        else:
+            raise ValidationError("The credit can no longer be updated.")
+                               
         instance.save()
                  
         """
