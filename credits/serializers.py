@@ -102,6 +102,7 @@ class CreditSerializer(serializers.ModelSerializer):
             raise ValidationError("There must be at least one product.")
         return value
     
+    """
     #Updates the product in the credit
     def _update_credit_products(self, instance, validated_data):
         product_data = validated_data.pop('clientcreditproduct_set', [])
@@ -119,8 +120,9 @@ class CreditSerializer(serializers.ModelSerializer):
                 ClientCreditProduct.objects.update_or_create(id_credit=instance, id_product=product['id_product'].id, defaults=product)
                     
             instance.total_amount = instance.calculate_total_amount()
-            
-        
+    
+    """
+    
     def create(self, validated_data):
         products_data = validated_data.pop('clientcreditproduct_set')
         credit = Credit.objects.create(**validated_data)
@@ -142,7 +144,7 @@ class CreditSerializer(serializers.ModelSerializer):
             if status == "approved":
                 
                 if instance.payment_set.count() == 0:
-                    start_date = timezone.now().date()
+                    start_date = timezone.now().date() + relativedelta(months=1)
                     no_installment = instance.no_installment
                     monthly_amount = instance.total_amount / no_installment
                     
@@ -154,7 +156,10 @@ class CreditSerializer(serializers.ModelSerializer):
                     instance.start_date = start_date
                     instance.end_date = instance.start_date + relativedelta(months=instance.no_installment-1)
                     
+                    """
+                    Update the product in the credit
                     self._update_credit_products(instance, validated_data)
+                    """
                     
                     instance.status = "approved"
                 
