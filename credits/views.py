@@ -14,18 +14,18 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-
+from rest_framework.permissions import IsAuthenticated
+from utils.permissions import CustomDjangoModelPermissions
 
 class ClientCreditProductViewSet(viewsets.ModelViewSet):
     queryset = ClientCreditProduct.objects.all()
     serializer_class = ClientCreditProductSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
 class CreditViewSet(viewsets.ModelViewSet):
     queryset = Credit.objects.all()
     serializer_class = CreditSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
     @action(detail=False, methods=['get'], url_path='user/(?P<client_id>[^/.]+)')
     def credits_by_user(self, request, client_id=None):
@@ -43,10 +43,10 @@ class CreditViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
 
 class InterestRateListCreateView(generics.ListCreateAPIView):
     queryset = InterestRate.objects.all()
     serializer_class = InterestRateSerializer
-    permission_classes = [IsAuthenticated, DjangoModelPermissions]
+    permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
