@@ -21,9 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             'groups'
             ]
         extra_kwargs = {'password': {'write_only': True}}
-    
-    
-    
+     
     def create(self, validated_data):
         
         print(validated_data)
@@ -37,5 +35,3 @@ class UserSerializer(serializers.ModelSerializer):
         user.groups.set(groups_data)
         
         return user
-    
-    

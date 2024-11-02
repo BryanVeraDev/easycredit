@@ -11,7 +11,8 @@ from django.core.serializers import serialize
 from rest_framework import routers, serializers, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 
 
 #from django.http import HttpResponse
@@ -30,10 +31,9 @@ class ProductTypeViewSet(viewsets.ModelViewSet):
     ordering_filters = ['description']
     filterset_fields = ['description']
     search_fields = ['id', 'description']
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]
     
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]
-    
+    permission_classes = [IsAuthenticated, DjangoModelPermissions]

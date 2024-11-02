@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from products.views import ProductTypeViewSet, ProductViewSet
-from credits.views import CreditViewSet, PaymentViewSet, InterestRateViewSet
+from credits.views import CreditViewSet, PaymentViewSet, InterestRateListCreateView
 from users.views import UserViewSet
 from clients.views import ClientViewSet
 
@@ -32,7 +32,7 @@ router.register(r'product-types', ProductTypeViewSet)
 router.register(r'products', ProductViewSet)
 router.register(r'credits', CreditViewSet)
 router.register(r'payments', PaymentViewSet)
-router.register(r'interest-rates', InterestRateViewSet)
+#router.register(r'interest-rates', InterestRateViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'clients', ClientViewSet)
 
@@ -43,5 +43,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     #path('products/', include('products.urls')),
     path('admin/', admin.site.urls),
+    path('api/interest-rates/', InterestRateListCreateView.as_view(), name='Interest rates'),
 ]
 
