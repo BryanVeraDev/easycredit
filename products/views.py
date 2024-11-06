@@ -25,7 +25,7 @@ class ProductTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
