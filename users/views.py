@@ -20,3 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+    

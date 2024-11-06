@@ -15,16 +15,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import CustomDjangoModelPermissions
 
-
-#from django.http import HttpResponse
-
-#def index(request):
-    #products = Product.objects.all()
-    #data = serialize('python', products)
-    #context = {'products': products}
-    #return render(request, 'products/index.html', context)
-    #return JsonResponse(data, safe=False)
-
 class ProductTypeViewSet(viewsets.ModelViewSet):
     queryset = ProductType.objects.all()
     serializer_class = ProductTypeSerializer
@@ -38,3 +28,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
+    
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()

@@ -28,7 +28,7 @@ class Credit(models.Model):
     status = models.CharField(max_length=15, default="pending", choices=CREDIT_STATUS)
     interest_rate = models.ForeignKey('InterestRate', on_delete=models.RESTRICT)    
     client = models.ForeignKey(Client, on_delete=models.RESTRICT) 
-    products = models.ManyToManyField(Product, through='ClientCreditProduct', through_fields=('id_credit', 'id_product'))
+    products = models.ManyToManyField(Product, through='ClientCreditProduct', through_fields=('id_credit', 'id_product'), blank=False)
     
     def __str__(self) -> str:
         return f'{self.description} - {self.client}'

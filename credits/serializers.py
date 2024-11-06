@@ -174,10 +174,6 @@ class CreditSerializer(serializers.ModelSerializer):
                                
         instance.save()
                  
-        """
-        Extended form
-        instance.description = validated_data.get('description', instance.description)
-        """
         return instance
         
 

@@ -18,3 +18,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+    
