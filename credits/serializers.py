@@ -100,8 +100,17 @@ class CreditSerializer(serializers.ModelSerializer):
     def validate_products(self, value):
         if not value:
             raise ValidationError("There must be at least one product.")
+        
+        inactive_products = [product['id_product'] for product in value if not product['id_product'].is_active]
+        
+        if inactive_products:
+            product_names = "\n".join([product.name for product in inactive_products])
+            raise ValidationError(
+                f"The following products are inactive and cannot be added to credit: {product_names}"
+            )
+            
         return value
-    
+
     """
     #Updates the product in the credit
     def _update_credit_products(self, instance, validated_data):
@@ -122,6 +131,7 @@ class CreditSerializer(serializers.ModelSerializer):
             instance.total_amount = instance.calculate_total_amount()
     
     """
+    
     
     def create(self, validated_data):
         products_data = validated_data.pop('clientcreditproduct_set')
@@ -145,6 +155,7 @@ class CreditSerializer(serializers.ModelSerializer):
                 
                 if instance.payment_set.count() == 0:
                     start_date = timezone.now().date() + relativedelta(months=1)
+                    start_date = timezone.now().date() + relativedelta(months=1)
                     no_installment = instance.no_installment
                     monthly_amount = instance.total_amount / no_installment
                     
@@ -160,7 +171,6 @@ class CreditSerializer(serializers.ModelSerializer):
                     Update the product in the credit
                     self._update_credit_products(instance, validated_data)
                     """
-                    
                     instance.status = "approved"
                 
             elif status == "rejected": 
