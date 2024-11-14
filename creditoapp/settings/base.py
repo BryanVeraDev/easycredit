@@ -20,13 +20,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
+"""
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure--wqyf_pf1prr-9&7bae9xtc!0vsk@7twn(0a#z)!qa1e3&_hhj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+"""
+
+
 
 
 # Application definition
@@ -113,12 +119,15 @@ AUTH_USER_MODEL = 'users.User'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+"""
+
 
 
 # Password validation
