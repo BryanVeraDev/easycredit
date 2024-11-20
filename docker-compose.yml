@@ -6,9 +6,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=omar
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=mydb
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
 
   api:
     build:

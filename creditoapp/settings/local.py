@@ -1,8 +1,8 @@
 from .base import *
 
-SECRET_KEY = "foo-ci"
+SECRET_KEY = "local-secret-key"
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 DATABASES = {
     "default": {
