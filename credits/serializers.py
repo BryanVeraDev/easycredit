@@ -110,29 +110,7 @@ class CreditSerializer(serializers.ModelSerializer):
             )
             
         return value
-
-    """
-    #Updates the product in the credit
-    def _update_credit_products(self, instance, validated_data):
-        product_data = validated_data.pop('clientcreditproduct_set', [])
-       
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-                
-        new_product_ids = [product['id_product'].id for product in product_data]
-        
-        if new_product_ids:
-            #Update products in a credit
-            instance.clientcreditproduct_set.exclude(id_product__in=new_product_ids).delete()
-                    
-            for product in product_data:
-                ClientCreditProduct.objects.update_or_create(id_credit=instance, id_product=product['id_product'].id, defaults=product)
-                    
-            instance.total_amount = instance.calculate_total_amount()
-    
-    """
-    
-    
+  
     def create(self, validated_data):
         products_data = validated_data.pop('clientcreditproduct_set')
         credit = Credit.objects.create(**validated_data)
@@ -155,7 +133,6 @@ class CreditSerializer(serializers.ModelSerializer):
                 
                 if instance.payment_set.count() == 0:
                     start_date = timezone.now().date() + relativedelta(months=1)
-                    start_date = timezone.now().date() + relativedelta(months=1)
                     no_installment = instance.no_installment
                     monthly_amount = instance.total_amount / no_installment
                     
@@ -167,10 +144,6 @@ class CreditSerializer(serializers.ModelSerializer):
                     instance.start_date = start_date
                     instance.end_date = instance.start_date + relativedelta(months=instance.no_installment-1)
                     
-                    """
-                    Update the product in the credit
-                    self._update_credit_products(instance, validated_data)
-                    """
                     instance.status = "approved"
                 
             elif status == "rejected": 

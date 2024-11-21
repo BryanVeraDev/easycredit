@@ -5,7 +5,7 @@ from .models import Client
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 
-class ProductTests(APITestCase):
+class ClientTests(APITestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
