@@ -9,8 +9,7 @@ class ProductTests(APITestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        
-        user_class = get_user_model()
+    
         cls.user = get_user_model().objects.create_superuser(
         email="test@example.com", password="testpassword"
         )
@@ -39,17 +38,17 @@ class ProductTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
 
     def test_user_str(self):
-        """Prueba para el método __str__ de User"""
+        """Test for user __str__ method"""
         expected_str = f'{self.user.id} - {self.user.first_name} {self.user.last_name}'
         self.assertEqual(str(self.user), expected_str)
         
     def test_product_str(self):
-        """Prueba para el método __str__ de Product"""
+        """Test for Product __str__ method"""
         expected_str = "High-Power Blender"
         self.assertEqual(str(self.product), expected_str)
 
     def test_product_type_str(self):
-        """Prueba para el método __str__ de ProductType"""
+        """Test for ProductType __str__ method"""
         expected_str = "Electronics"
         self.assertEqual(str(self.product_type), expected_str)
 

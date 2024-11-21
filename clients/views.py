@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from utils.permissions import CustomDjangoModelPermissions
 
 class ClientViewSet(viewsets.ModelViewSet):
-    queryset = Client.objects.all()
+    queryset = Client.objects.all().order_by('id')
     serializer_class = ClientSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     

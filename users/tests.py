@@ -2,8 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
@@ -103,8 +102,6 @@ class UserTestCase(APITestCase):
         
         response = self.client.delete(url, format="json")
         
-        url = reverse("user-detail", kwargs={"pk": self.user.id})
-
         self.user.refresh_from_db()
         
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
