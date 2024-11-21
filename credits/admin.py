@@ -5,6 +5,10 @@ class ClientCreditProductInLine(admin.TabularInline):
     model = ClientCreditProduct
     extra = 1
 
+class ClientCreditProductAdmin(admin.ModelAdmin):
+    list_display = ('id_credit', 'id_product')
+    list_display_links = ('id_credit', 'id_product')
+
 class CreditAdmin(admin.ModelAdmin):
     inlines = [ClientCreditProductInLine]
     list_display = ('id', 'description', 'total_amount', 'no_installment', 'client')
@@ -17,6 +21,7 @@ class PaymentAdmin(admin.ModelAdmin):
 admin.site.register(Credit, CreditAdmin)
 admin.site.register(Payment, PaymentAdmin)
 admin.site.register(InterestRate)
+admin.site.register(ClientCreditProduct, ClientCreditProductAdmin)
 
 
 

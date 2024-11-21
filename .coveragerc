@@ -1,0 +1,13 @@
+[run]
+omit = 
+    */venv/*
+    */migrations/*
+    manage.py
+    */__init__.py
+
+[report]
+include =
+    products/*
+    users/*
+    clients/*
+    utils/*
