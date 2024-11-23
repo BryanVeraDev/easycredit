@@ -23,15 +23,12 @@ class ClientCreditProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
 class CreditViewSet(viewsets.ModelViewSet):
-    queryset = Credit.objects.all()
+    queryset = Credit.objects.all().order_by('id')
     serializer_class = CreditSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
-    
-    @action(detail=False, methods=['get'], url_path='user/(?P<client_id>[^/.]+)')
-    def credits_by_user(self, request, client_id=None):
-        if not client_id:
-            return Response({"error": "Client ID is required"}, status=400)
-        
+
+    @action(detail=False, methods=['get'], url_path='clients/(?P<client_id>[^/.]+)')
+    def credits_by_client(self, request, client_id=None):
         if not Client.objects.filter(id=client_id).exists():
             return Response({"error": "Client not found"}, status=400)
     

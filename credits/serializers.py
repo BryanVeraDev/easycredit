@@ -27,10 +27,7 @@ class PaymentSerializer(serializers.ModelSerializer):
             ]
         
     def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-            
-        instance.save()
+        instance.update(validated_data)
         
         credit = instance.credit
         
@@ -113,6 +110,12 @@ class CreditSerializer(serializers.ModelSerializer):
   
     def create(self, validated_data):
         products_data = validated_data.pop('clientcreditproduct_set')
+        
+        client = validated_data.get('client')
+        
+        if not client.is_active:
+            raise ValidationError("The client is inactive and cannot create a credit")
+        
         credit = Credit.objects.create(**validated_data)
         
         for product_data in products_data:
@@ -125,38 +128,8 @@ class CreditSerializer(serializers.ModelSerializer):
         return credit
     
     def update(self, instance, validated_data):
-        status = validated_data.pop('status', [])
-        instance_status = instance.status
-        
-        if instance_status == "pending":
-            if status == "approved":
+        instance.update(validated_data)
                 
-                if instance.payment_set.count() == 0:
-                    start_date = timezone.now().date() + relativedelta(months=1)
-                    no_installment = instance.no_installment
-                    monthly_amount = instance.total_amount / no_installment
-                    
-                    for i in range(no_installment):
-                        payment_date = start_date + relativedelta(months=i)
-                        
-                        Payment.objects.create(credit=instance, payment_date=payment_date, due_date=payment_date + relativedelta(weeks=1), payment_amount=monthly_amount)
-                    
-                    instance.start_date = start_date
-                    instance.end_date = instance.start_date + relativedelta(months=instance.no_installment-1)
-                    
-                    instance.status = "approved"
-                
-            elif status == "rejected": 
-                instance.status = "rejected"
-            
-            elif status == "pending":
-                self._update_credit_products(instance, validated_data)
-                
-        else:
-            raise ValidationError("The credit can no longer be updated.")
-                               
-        instance.save()
-                 
         return instance
         
 

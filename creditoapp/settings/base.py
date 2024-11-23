@@ -48,9 +48,6 @@ ROOT_URLCONF = 'creditoapp.urls'
 WSGI_APPLICATION = 'creditoapp.wsgi.application'
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
