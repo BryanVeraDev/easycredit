@@ -7,7 +7,7 @@ from .serializers import CreditSerializer, PaymentSerializer, InterestRateSerial
 
 from django.core.serializers import serialize
 
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework import routers, serializers, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.decorators import action
@@ -38,12 +38,13 @@ class CreditViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
               
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().order_by('id')
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
+    http_method_names = ['get', 'post', 'put', 'patch']
 
 class InterestRateListCreateView(generics.ListCreateAPIView):
-    queryset = InterestRate.objects.all()
+    queryset = InterestRate.objects.all().order_by('id')
     serializer_class = InterestRateSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     

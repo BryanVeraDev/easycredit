@@ -110,6 +110,7 @@ class CreditTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f' Bearer {self.refresh.access_token}')
         self.url_template = reverse("credit-list") + "clients/{}/"
 
+    #Test for Credit
     def test_calculate_total_amount(self):
         total_amount = self.credit.calculate_total_amount()
         self.assertEqual(total_amount, Decimal("300.00"))
@@ -149,6 +150,7 @@ class CreditTestCase(APITestCase):
         response = self.client.get(url, format="json")
     
         self.assertEqual(response.status_code, status.HTTP_200_OK) 
+
         self.assertEqual(response.data[0]["description"], "Crédito Prueba")
          
     def test_get_credit_detail_no_valid_client(self):
@@ -237,6 +239,27 @@ class CreditTestCase(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
+    def test_update_put_credit(self):
+        url = reverse("credit-detail", kwargs={"pk": self.credit.id})
+        
+        credit_data = {
+            "description": "Crédito Prueba 1",
+            "no_installment": 12,
+            "penalty_rate": Decimal("2.5"),
+            "status": "approved",
+            "interest_rate": self.interest_rate.id,
+            "client": self.client_user.id,
+            "products": [
+                {"id_product": self.product1.id, "quantity": 2},
+                {"id_product": self.product2.id, "quantity": 1}
+            ]
+        }
+        
+        response = self.client.put(url, credit_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("status"), "approved")
+        
     def test_update_patch_credit_approved(self):
         url = reverse("credit-detail", kwargs={"pk": self.credit.id})
         
@@ -262,7 +285,6 @@ class CreditTestCase(APITestCase):
         self.assertEqual(response.data.get("status"), "rejected")
     
     def test_update_patch_credit_no_longer_updated(self):
-        
         self.credit.status = "approved"
         self.credit.save()
         
@@ -275,6 +297,75 @@ class CreditTestCase(APITestCase):
         with self.assertRaises(ValidationError):
             response = self.client.patch(url, data)
             
+    #Test for Payment
+    def test_get_payment_list(self):
+        url = reverse("credit-detail", kwargs={"pk": self.credit.id})
+        
+        data = {
+            "status": "approved"
+        }
+        
+        self.client.patch(url, data)
+        
+        url = reverse("payment-list")
+        
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get("results")), 5)
+        
+    def test_get_payment_detail(self):
+        url = reverse("credit-detail", kwargs={"pk": self.credit.id})
+        
+        data = {
+            "status": "approved"
+        }
+        
+        self.client.patch(url, data)
+        
+        url = reverse("payment-detail", kwargs={"pk": 1})
+        
+        response = self.client.get(url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("status"), "pending")
+        
+    def test_create_payment(self):
+        url = reverse("payment-list")
+        
+        payment_data = {
+            "payment_amount": 100,
+            "payment_date": "2024-10-10",
+            "due_date": "2024-10-17",
+            "credit": self.credit.id
+        }
+        
+        response = self.client.post(url, payment_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+          
+    def test_update_put_payment(self):
+        payment_test = Payment.objects.create(
+            payment_amount = 1000,
+            payment_date = "2024-11-11",
+            due_date = "2024-11-18",
+            status = "pending",
+            credit = self.credit
+        )
+        
+        url = reverse("payment-detail", kwargs={"pk": payment_test.id})
+        
+        data = {
+            "payment_amount": 1000,
+            "payment_date": "2024-11-11",
+            "due_date": "2024-11-18",
+            "status": "completed",
+            "credit": self.credit.id
+        }
+        
+        response = self.client.put(url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("status"), "completed")
+        
     def test_update_patch_payment(self):
         payment_test = Payment.objects.create(
             payment_amount = 1000,
@@ -294,7 +385,25 @@ class CreditTestCase(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("status"), "completed")
-         
+        
+    #Test for Interest Rate
+    def test_get_interest_rate_list(self):
+        url = reverse("interest_rates")
+        
+        response = self.client.get(url, format="json")
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_create_interest_rate(self):
+        url = reverse("interest_rates")
+        
+        data = {
+            "percentage": 5.5
+        }
+        
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
     def test_credit_string_representation(self):
         self.assertEqual(str(self.credit), "Crédito Prueba - 123456789012 - John Doe")
     
