@@ -27,6 +27,16 @@ class CreditViewSet(viewsets.ModelViewSet):
     serializer_class = CreditSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
 
+    @action(detail=False, methods=['get'], url_path='details/(?P<credit_id>[^/.]+)')
+    def credits_by_id(self, request, credit_id=None):
+        if not Credit.objects.filter(id=credit_id).exists():
+            return Response({"error": "Credit not found"}, status=400)
+    
+        credits = Credit.objects.filter(id=credit_id)
+        serializer = self.get_serializer(credits, many=True)
+        
+        return Response(serializer.data)
+    
     @action(detail=False, methods=['get'], url_path='clients/(?P<client_id>[^/.]+)')
     def credits_by_client(self, request, client_id=None):
         if not Client.objects.filter(id=client_id).exists():

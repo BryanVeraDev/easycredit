@@ -108,7 +108,8 @@ class CreditTestCase(APITestCase):
     
     def setUp(self):
         self.client.credentials(HTTP_AUTHORIZATION=f' Bearer {self.refresh.access_token}')
-        self.url_template = reverse("credit-list") + "clients/{}/"
+        self.url_template_clients = reverse("credit-list") + "clients/{}/"
+        self.url_template_credits = reverse("credit-list") + "details/{}/"
 
     #Test for Credit
     def test_calculate_total_amount(self):
@@ -145,7 +146,7 @@ class CreditTestCase(APITestCase):
         self.assertEqual(response.data.get("description"), "Crédito Prueba")
         
     def test_get_credit_detail_valid_client(self):
-        url = self.url_template.format(self.client_user.id)
+        url = self.url_template_clients.format(self.client_user.id)
         
         response = self.client.get(url, format="json")
     
@@ -154,11 +155,27 @@ class CreditTestCase(APITestCase):
         self.assertEqual(response.data[0]["description"], "Crédito Prueba")
          
     def test_get_credit_detail_no_valid_client(self):
-        url = self.url_template.format(10)
+        url = self.url_template_clients.format(10)
         
         response = self.client.get(url, format="json")
     
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) 
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_get_payment_plan_valid_credit(self):
+        url = self.url_template_credits.format(self.credit.id)
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        self.assertEqual(response.data[0]["description"], "Crédito Prueba") 
+    
+    def test_get_payment_plan_no_valid_credit(self):
+        url = self.url_template_credits.format(10)
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)   
         
     def test_create_credit(self):
         url = reverse("credit-list")
