@@ -32,7 +32,6 @@ router.register(r'product-types', ProductTypeViewSet)
 router.register(r'products', ProductViewSet)
 router.register(r'credits', CreditViewSet)
 router.register(r'payments', PaymentViewSet)
-#router.register(r'interest-rates', InterestRateViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'clients', ClientViewSet)
 
@@ -42,6 +41,6 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
-    path('api/interest-rates/', InterestRateListCreateView.as_view(), name='Interest_rates'),
+    path('api/interest-rates/', InterestRateListCreateView.as_view(), name='interest_rates'),
 ]
 

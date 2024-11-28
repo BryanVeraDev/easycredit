@@ -7,7 +7,7 @@ from .serializers import CreditSerializer, PaymentSerializer, InterestRateSerial
 
 from django.core.serializers import serialize
 
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework import routers, serializers, viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.decorators import action
@@ -23,15 +23,22 @@ class ClientCreditProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     
 class CreditViewSet(viewsets.ModelViewSet):
-    queryset = Credit.objects.all()
+    queryset = Credit.objects.all().order_by('id')
     serializer_class = CreditSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
+
+    @action(detail=False, methods=['get'], url_path='details/(?P<credit_id>[^/.]+)')
+    def credits_by_id(self, request, credit_id=None):
+        if not Credit.objects.filter(id=credit_id).exists():
+            return Response({"error": "Credit not found"}, status=400)
     
-    @action(detail=False, methods=['get'], url_path='user/(?P<client_id>[^/.]+)')
-    def credits_by_user(self, request, client_id=None):
-        if not client_id:
-            return Response({"error": "Client ID is required"}, status=400)
+        credits = Credit.objects.filter(id=credit_id)
+        serializer = self.get_serializer(credits, many=True)
         
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='clients/(?P<client_id>[^/.]+)')
+    def credits_by_client(self, request, client_id=None):
         if not Client.objects.filter(id=client_id).exists():
             return Response({"error": "Client not found"}, status=400)
     
@@ -41,12 +48,13 @@ class CreditViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
               
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().order_by('id')
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
+    http_method_names = ['get', 'post', 'put', 'patch']
 
 class InterestRateListCreateView(generics.ListCreateAPIView):
-    queryset = InterestRate.objects.all()
+    queryset = InterestRate.objects.all().order_by('id')
     serializer_class = InterestRateSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
     

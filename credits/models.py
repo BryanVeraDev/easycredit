@@ -2,7 +2,10 @@ from django.db import models
 from clients.models import Client
 from products.models import Product
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError 
+
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 
 def validate_positive(value):
     if value < 0:
@@ -41,6 +44,36 @@ class Credit(models.Model):
             
         return total
 
+    def update(self, validated_data):
+        status = validated_data.pop('status', [])
+        instance_status = self.status
+        
+        if instance_status == "pending":
+            if status == "approved":
+                
+                if self.payment_set.count() == 0:
+                    start_date = timezone.now().date() + relativedelta(months=1)
+                    no_installment = self.no_installment
+                    monthly_amount = self.total_amount / no_installment
+                    
+                    for i in range(no_installment):
+                        payment_date = start_date + relativedelta(months=i)
+                        
+                        Payment.objects.create(credit=self, payment_date=payment_date, due_date=payment_date + relativedelta(weeks=1), payment_amount=monthly_amount)
+                    
+                    self.start_date = start_date
+                    self.end_date = self.start_date + relativedelta(months=self.no_installment-1)
+                    
+                    self.status = "approved"
+                
+            elif status == "rejected": 
+                self.status = "rejected"
+             
+        else:
+            raise ValidationError("The credit can no longer be updated.")
+                               
+        self.save()
+        
 class Payment(models.Model):
     
     PAYMENT_STATUS = {
@@ -57,6 +90,12 @@ class Payment(models.Model):
     
     def __str__(self) -> str:
         return f'{self.id} - {self.credit.description}'
+    
+    def update(self, validated_data):
+        for attr, value in validated_data.items():
+            setattr(self, attr, value) 
+            
+        self.save()
 
 class ClientCreditProduct(models.Model):
     id_credit = models.ForeignKey(Credit, on_delete=models.RESTRICT)
@@ -70,7 +109,7 @@ class ClientCreditProduct(models.Model):
   
     def __str__(self) -> str:
         return f'{self.id_credit} - {self.id_product} - Quantity: {self.quantity}'
-    
+     
 class InterestRate(models.Model):
     id = models.SmallAutoField(primary_key=True)
     percentage = models.DecimalField(max_digits=4, decimal_places=2, validators=[validate_positive])
