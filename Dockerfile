@@ -6,6 +6,6 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 COPY requirements/* /app/
-RUN pip install -r local.txt
+RUN pip install -r prod.txt
 
 COPY . /app/
