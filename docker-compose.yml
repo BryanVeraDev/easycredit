@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: ucredit
-    command: sh -c "python manage.py migrate --settings=todoapp.settings.prod && python manage.py runserver 0.0.0.0:8000 --settings=todoapp.settings.prod"
+    command: sh -c "python manage.py migrate --settings=creditoapp.settings.prod && python manage.py runserver 0.0.0.0:8000 --settings=creditoapp.settings.prod"
     restart: always
     volumes:
       - .:/app

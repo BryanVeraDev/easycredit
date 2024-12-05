@@ -68,6 +68,9 @@ class Credit(models.Model):
                 
             elif status == "rejected": 
                 self.status = "rejected"
+            
+            else:
+                raise ValidationError("The credit can no longer be updated.")
              
         else:
             raise ValidationError("The credit can no longer be updated.")
@@ -92,8 +95,18 @@ class Payment(models.Model):
         return f'{self.id} - {self.credit.description}'
     
     def update(self, validated_data):
-        for attr, value in validated_data.items():
-            setattr(self, attr, value) 
+        status = validated_data.pop('status', [])
+        instance_status = self.status
+        
+        if instance_status == "pending":
+            if status == "completed":
+                self.status = "completed"
+            
+            else:
+                raise ValidationError("The payment can no longer be updated.")
+                
+        else:
+            raise ValidationError("The payment can no longer be updated.")
             
         self.save()
 

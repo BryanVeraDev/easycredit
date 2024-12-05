@@ -27,13 +27,18 @@ class PaymentSerializer(serializers.ModelSerializer):
             ]
         
     def update(self, instance, validated_data):
-        instance.update(validated_data)
         
-        credit = instance.credit
+        try:
+            instance.update(validated_data)
+            
+            credit = instance.credit
+            
+            if credit.payment_set.filter(status="completed").count() == credit.payment_set.count():
+                credit.status = "paid"
+                credit.save()
         
-        if credit.payment_set.filter(status="completed").count() == credit.payment_set.count():
-            credit.status = "paid"
-            credit.save()
+        except Exception as e:
+            raise ValidationError(f"Error updating payment: {str(e)}")
         
         return instance
              
@@ -128,7 +133,11 @@ class CreditSerializer(serializers.ModelSerializer):
         return credit
     
     def update(self, instance, validated_data):
-        instance.update(validated_data)
+        
+        try:
+            instance.update(validated_data)
+        except Exception as e:
+            raise ValidationError(f"Error updating credit: {str(e)}")
                 
         return instance
         

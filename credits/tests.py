@@ -311,8 +311,9 @@ class CreditTestCase(APITestCase):
             "status": "rejected"
         }
         
-        with self.assertRaises(ValidationError):
-            response = self.client.patch(url, data)
+        response = self.client.patch(url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             
     #Test for Payment
     def test_get_payment_list(self):
