@@ -26,6 +26,11 @@ class CreditViewSet(viewsets.ModelViewSet):
     queryset = Credit.objects.all().order_by('id')
     serializer_class = CreditSerializer
     permission_classes = [IsAuthenticated, CustomDjangoModelPermissions]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['client', 'status', 'interest_rate', 'application_date', 'start_date', 'end_date']
+    search_fields = ['description', 'client__first_name',  'status']
+    ordering_fields = ['id', 'total_amount', 'no_installment', 'application_date', 'start_date', 'end_date', 'penalty_rate', 'status']
+
 
     @action(detail=False, methods=['get'], url_path='details/(?P<credit_id>[^/.]+)')
     def credits_by_id(self, request, credit_id=None):
